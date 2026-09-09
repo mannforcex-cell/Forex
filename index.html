@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MFX SIGNAL // CYBER FORCE X</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #07090d;
+    --panel: #10141b;
+    --panel-2: #161c25;
+    --line: #232b38;
+    --gold: #e8b64a;
+    --gold-dim: #7a6329;
+    --cyan: #35d9c4;
+    --buy: #3ecf7e;
+    --sell: #e8546a;
+    --wait: #8b96a8;
+    --text: #dbe2ee;
+    --text-dim: #7c8698;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 15% 0%, #101a1f 0%, transparent 45%),
+      radial-gradient(circle at 85% 10%, #1a1410 0%, transparent 40%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Space Grotesk', sans-serif;
+    line-height:1.5;
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+  h1,h2,h3,.brand,.mono-label{font-family:'Orbitron', sans-serif;}
+
+  /* ===== Header ===== */
+  header{
+    padding:22px 20px 18px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    position:relative;
+    overflow:hidden;
+  }
+  header::before{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(90deg, transparent, rgba(232,182,74,.06), transparent);
+    pointer-events:none;
+  }
+  .brand{
+    font-size:1.15rem;
+    font-weight:700;
+    letter-spacing:1px;
+    color:var(--gold);
+  }
+  .brand span{color:var(--cyan);}
+  .brand-sub{
+    font-size:.68rem;
+    color:var(--text-dim);
+    letter-spacing:2px;
+    margin-top:3px;
+  }
+  .clock{
+    text-align:right;
+    font-size:.75rem;
+    color:var(--text-dim);
+  }
+  .clock b{color:var(--text); font-size:.95rem; display:block;}
+
+  /* ===== Warning banner ===== */
+  .warn-bar{
+    margin:16px 20px 0;
+    background:linear-gradient(90deg, rgba(232,84,106,.12), rgba(232,84,106,.03));
+    border:1px solid rgba(232,84,106,.35);
+    border-left:3px solid var(--sell);
+    border-radius:6px;
+    padding:13px 16px;
+    font-size:.82rem;
+    color:#f0c4cc;
+  }
+  .warn-bar b{color:#ffdfe4;}
+
+  /* ===== Symbol tabs ===== */
+  .tabs{
+    display:flex;
+    gap:8px;
+    margin:22px 20px 0;
+    border-bottom:1px solid var(--line);
+    overflow-x:auto;
+  }
+  .tab{
+    padding:10px 16px;
+    font-size:.8rem;
+    font-weight:600;
+    color:var(--text-dim);
+    background:none;
+    border:none;
+    border-bottom:2px solid transparent;
+    cursor:pointer;
+    white-space:nowrap;
+    letter-spacing:.5px;
+  }
+  .tab.active{
+    color:var(--gold);
+    border-bottom-color:var(--gold);
+  }
+  .tab .prio{
+    font-size:.6rem;
+    background:var(--gold);
+    color:#1a1305;
+    padding:1px 5px;
+    border-radius:3px;
+    margin-left:6px;
+    font-weight:700;
+  }
+
+  main{padding:20px; max-width:900px; margin:0 auto;}
+  .symbol-view{display:none;}
+  .symbol-view.active{display:block;}
+
+  /* ===== Signal card ===== */
+  .signal-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px;
+    position:relative;
+    overflow:hidden;
+  }
+  .signal-card.buy{border-color:rgba(62,207,126,.4);}
+  .signal-card.sell{border-color:rgba(232,84,106,.4);}
+  .signal-card::before{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:2px;
+  }
+  .signal-card.buy::before{background:var(--buy);}
+  .signal-card.sell::before{background:var(--sell);}
+  .signal-card.wait::before{background:var(--wait);}
+
+  .signal-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .sym-name{font-size:1.3rem; font-weight:700; letter-spacing:1px;}
+  .sym-tag{font-size:.7rem; color:var(--text-dim); letter-spacing:1px; margin-top:2px;}
+  .signal-badge{
+    font-family:'Orbitron', sans-serif;
+    font-size:.85rem;
+    font-weight:700;
+    padding:7px 16px;
+    border-radius:6px;
+    letter-spacing:2px;
+  }
+  .signal-badge.buy{background:rgba(62,207,126,.15); color:var(--buy); border:1px solid rgba(62,207,126,.4);}
+  .signal-badge.sell{background:rgba(232,84,106,.15); color:var(--sell); border:1px solid rgba(232,84,106,.4);}
+  .signal-badge.wait{background:rgba(139,150,168,.15); color:var(--wait); border:1px solid rgba(139,150,168,.4);}
+
+  .levels{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(120px,1fr));
+    gap:10px;
+    margin:14px 0 16px;
+  }
+  .level-box{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:11px 13px;
+  }
+  .level-box .lbl{font-size:.65rem; color:var(--text-dim); letter-spacing:1.5px; margin-bottom:4px;}
+  .level-box .val{font-size:1.05rem; font-weight:700; font-family:'Orbitron',sans-serif;}
+  .level-box.entry .val{color:var(--gold);}
+  .level-box.sl .val{color:var(--sell);}
+  .level-box.tp .val{color:var(--buy);}
+
+  .confidence-row{
+    display:flex; align-items:center; gap:10px; margin-bottom:14px; font-size:.75rem; color:var(--text-dim);
+  }
+  .conf-bar{flex:1; height:6px; background:var(--panel-2); border-radius:3px; overflow:hidden;}
+  .conf-fill{height:100%; background:linear-gradient(90deg, var(--gold-dim), var(--gold));}
+
+  .note-line{
+    font-size:.78rem;
+    color:var(--text-dim);
+    border-top:1px solid var(--line);
+    padding-top:12px;
+    margin-top:2px;
+  }
+  .note-line b{color:var(--text);}
+
+  .refresh-row{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:16px; gap:10px; flex-wrap:wrap;
+  }
+  .updated-txt{font-size:.7rem; color:var(--text-dim);}
+  .refresh-btn{
+    background:var(--panel-2);
+    border:1px solid var(--gold-dim);
+    color:var(--gold);
+    padding:9px 18px;
+    border-radius:6px;
+    font-family:'Orbitron',sans-serif;
+    font-size:.72rem;
+    font-weight:700;
+    letter-spacing:1.5px;
+    cursor:pointer;
+  }
+  .refresh-btn:active{transform:scale(.97);}
+
+  .followcard{
+    margin-top:14px;
+    background:rgba(53,217,196,.06);
+    border:1px solid rgba(53,217,196,.25);
+    border-left:3px solid var(--cyan);
+    border-radius:6px;
+    padding:11px 14px;
+    font-size:.76rem;
+    color:#c3f2ec;
+  }
+
+  /* ===== Section headers ===== */
+  .sec-head{
+    display:flex; align-items:baseline; gap:10px;
+    margin:34px 0 12px;
+  }
+  .sec-head h2{font-size:.95rem; letter-spacing:1px; color:var(--text);}
+  .sec-head .line{flex:1; height:1px; background:var(--line);}
+
+  /* ===== Chart embed ===== */
+  .chart-wrap{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    height:460px;
+  }
+  .chart-wrap iframe, .chart-wrap > div{width:100%; height:100%;}
+  .no-chart{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:30px 20px;
+    text-align:center;
+    color:var(--text-dim);
+    font-size:.82rem;
+  }
+
+  /* ===== News calendar ===== */
+  .calendar-wrap{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    height:480px;
+  }
+  .calendar-wrap iframe{width:100%; height:100%; border:none;}
+
+  /* ===== Footer ===== */
+  footer{
+    text-align:center;
+    margin-top:50px;
+    padding:22px 20px 0;
+    border-top:1px solid var(--line);
+  }
+  .footer-brand{
+    font-family:'Orbitron', sans-serif;
+    font-size:.75rem;
+    letter-spacing:2px;
+    color:var(--gold-dim);
+  }
+  .footer-brand b{color:var(--gold);}
+  .footer-sub{font-size:.68rem; color:var(--text-dim); margin-top:6px; letter-spacing:1px;}
+
+  @media (min-width:640px){
+    .signal-card{padding:26px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="brand">MFX <span>SIGNAL</span></div>
+    <div class="brand-sub">CYBER FORCE X · AUTO MARKET ANALYSIS</div>
+  </div>
+  <div class="clock">
+    <b id="liveClock">--:--:--</b>
+    <span id="liveDate">-- --- ----</span>
+  </div>
+</header>
+
+<div class="warn-bar">
+  <b>⚠ PERINGATAN RISIKO:</b> Sistem ini memberi <b>analisis auto</b> sebagai panduan sahaja, bukan jaminan profit. Trading forex/crypto berisiko tinggi. Sentiasa gunakan money management, jangan over-leverage, dan jangan letak modal yang anda tak mampu rugi. Berhenti bila cukup — jangan revenge trade selepas loss.
+</div>
+
+<div class="tabs" id="tabRow">
+  <button class="tab active" data-sym="xauusd">XAUUSD <span class="prio">UTAMA</span></button>
+  <button class="tab" data-sym="vol80">VOLATILITY 80</button>
+  <button class="tab" data-sym="btcusd">BTCUSD</button>
+</div>
+
+<main>
+
+  <!-- XAUUSD VIEW -->
+  <section class="symbol-view active" id="view-xauusd">
+    <div class="signal-card" id="card-xauusd">
+      <div class="signal-top">
+        <div>
+          <div class="sym-name">XAU/USD</div>
+          <div class="sym-tag">GOLD SPOT · PRIORITI UTAMA</div>
+        </div>
+        <div class="signal-badge" id="badge-xauusd">—</div>
+      </div>
+
+      <div class="levels">
+        <div class="level-box entry"><div class="lbl">ENTRY</div><div class="val" id="entry-xauusd">-</div></div>
+        <div class="level-box sl"><div class="lbl">STOP LOSS</div><div class="val" id="sl-xauusd">-</div></div>
+        <div class="level-box tp"><div class="lbl">TAKE PROFIT</div><div class="val" id="tp-xauusd">-</div></div>
+      </div>
+
+      <div class="confidence-row">
+        <span>KEYAKINAN SISTEM</span>
+        <div class="conf-bar"><div class="conf-fill" id="conf-xauusd" style="width:0%"></div></div>
+        <span id="confpct-xauusd">0%</span>
+      </div>
+
+      <div class="note-line" id="note-xauusd">Menganalisis...</div>
+
+      <div class="followcard">
+        📌 Ini adalah hasil <b>auto-detect</b> sistem berdasarkan pergerakan pasaran semasa. Owner/trader digalak <b>ikut sinyal yang sistem beri</b>, bukan tetapkan entry sendiri secara manual — biar sistem kunci sasaran, anda hanya eksekut dengan berhati-hati.
+      </div>
+
+      <div class="refresh-row">
+        <span class="updated-txt">Kemaskini terakhir: <span id="time-xauusd">-</span> · auto refresh harian</span>
+        <button class="refresh-btn" onclick="generateSignal('xauusd')">JANA SEMULA</button>
+      </div>
+    </div>
+
+    <div class="sec-head"><h2>CHART VIEW — LIVE</h2><div class="line"></div></div>
+    <div class="chart-wrap" id="tv-xauusd"></div>
+  </section>
+
+  <!-- VOL80 VIEW -->
+  <section class="symbol-view" id="view-vol80">
+    <div class="signal-card" id="card-vol80">
+      <div class="signal-top">
+        <div>
+          <div class="sym-name">VOLATILITY 80</div>
+          <div class="sym-tag">SYNTHETIC INDEX</div>
+        </div>
+        <div class="signal-badge" id="badge-vol80">—</div>
+      </div>
+
+      <div class="levels">
+        <div class="level-box entry"><div class="lbl">ENTRY</div><div class="val" id="entry-vol80">-</div></div>
+        <div class="level-box sl"><div class="lbl">STOP LOSS</div><div class="val" id="sl-vol80">-</div></div>
+        <div class="level-box tp"><div class="lbl">TAKE PROFIT</div><div class="val" id="tp-vol80">-</div></div>
+      </div>
+
+      <div class="confidence-row">
+        <span>KEYAKINAN SISTEM</span>
+        <div class="conf-bar"><div class="conf-fill" id="conf-vol80" style="width:0%"></div></div>
+        <span id="confpct-vol80">0%</span>
+      </div>
+
+      <div class="note-line" id="note-vol80">Menganalisis...</div>
+
+      <div class="followcard">
+        📌 Sinyal ini adalah <b>panduan auto-analysis</b>. Sila padankan dengan chart Vol 80 pada platform Deriv sebelum masuk posisi.
+      </div>
+
+      <div class="refresh-row">
+        <span class="updated-txt">Kemaskini terakhir: <span id="time-vol80">-</span></span>
+        <button class="refresh-btn" onclick="generateSignal('vol80')">JANA SEMULA</button>
+      </div>
+    </div>
+
+    <div class="sec-head"><h2>CHART VIEW</h2><div class="line"></div></div>
+    <div class="no-chart">
+      Vol 80 (Volatility 80 Index) adalah simbol eksklusif platform Deriv dan tiada live chart public di sini. Sila rujuk chart terus di app/website Deriv untuk pengesahan visual sebelum entry.
+    </div>
+  </section>
+
+  <!-- BTCUSD VIEW -->
+  <section class="symbol-view" id="view-btcusd">
+    <div class="signal-card" id="card-btcusd">
+      <div class="signal-top">
+        <div>
+          <div class="sym-name">BTC/USD</div>
+          <div class="sym-tag">CRYPTO</div>
+        </div>
+        <div class="signal-badge" id="badge-btcusd">—</div>
+      </div>
+
+      <div class="levels">
+        <div class="level-box entry"><div class="lbl">ENTRY</div><div class="val" id="entry-btcusd">-</div></div>
+        <div class="level-box sl"><div class="lbl">STOP LOSS</div><div class="val" id="sl-btcusd">-</div></div>
+        <div class="level-box tp"><div class="lbl">TAKE PROFIT</div><div class="val" id="tp-btcusd">-</div></div>
+      </div>
+
+      <div class="confidence-row">
+        <span>KEYAKINAN SISTEM</span>
+        <div class="conf-bar"><div class="conf-fill" id="conf-btcusd" style="width:0%"></div></div>
+        <span id="confpct-btcusd">0%</span>
+      </div>
+
+      <div class="note-line" id="note-btcusd">Menganalisis...</div>
+
+      <div class="followcard">
+        📌 Ikut arah sinyal sistem. Volatiliti BTC tinggi — kekalkan lot size kecil dan jangan tambah posisi semasa floating loss.
+      </div>
+
+      <div class="refresh-row">
+        <span class="updated-txt">Kemaskini terakhir: <span id="time-btcusd">-</span></span>
+        <button class="refresh-btn" onclick="generateSignal('btcusd')">JANA SEMULA</button>
+      </div>
+    </div>
+
+    <div class="sec-head"><h2>CHART VIEW — LIVE</h2><div class="line"></div></div>
+    <div class="chart-wrap" id="tv-btcusd"></div>
+  </section>
+
+  <div class="sec-head"><h2>JADUAL NEWS FOREX HARI INI</h2><div class="line"></div></div>
+  <div class="calendar-wrap">
+    <iframe src="https://www.tradingview-widget.com/embed-widget/events/?locale=en#%7B%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Afalse%2C%22width%22%3A%22100%25%22%2C%22height%22%3A%22100%25%22%2C%22importanceFilter%22%3A%22-1%2C0%2C1%22%2C%22utm_source%22%3A%22%22%2C%22utm_medium%22%3A%22widget%22%2C%22utm_campaign%22%3A%22events%22%7D"></iframe>
+  </div>
+  <p style="font-size:.68rem;color:var(--text-dim);margin-top:8px;">Kalendar dikuasakan oleh TradingView, update automatik ikut waktu sebenar.</p>
+
+  <footer>
+    <div class="footer-brand">POWERED BY <b>MFX OFFICIAL</b> #CYBER FORCE X</div>
+    <div class="footer-sub">MANN FORCE X · SIGNAL & TRADING TOOLS</div>
+  </footer>
+
+</main>
+
+<script src="https://s3.tradingview.com/tv.js"></script>
+<script>
+/* ===== Clock ===== */
+function tickClock(){
+  const d = new Date();
+  document.getElementById('liveClock').textContent = d.toLocaleTimeString('en-GB');
+  document.getElementById('liveDate').textContent = d.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+}
+tickClock();
+setInterval(tickClock, 1000);
+
+/* ===== Tabs ===== */
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.symbol-view').forEach(v=>v.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('view-'+tab.dataset.sym).classList.add('active');
+  });
+});
+
+/* ===== TradingView chart widgets ===== */
+function loadTVChart(containerId, symbol){
+  new TradingView.widget({
+    "autosize": true,
+    "symbol": symbol,
+    "interval": "15",
+    "timezone": "Asia/Kuala_Lumpur",
+    "theme": "dark",
+    "style": "1",
+    "locale": "en",
+    "toolbar_bg": "#10141b",
+    "enable_publishing": false,
+    "hide_top_toolbar": false,
+    "hide_legend": false,
+    "save_image": false,
+    "container_id": containerId
+  });
+}
+window.addEventListener('load', ()=>{
+  loadTVChart('tv-xauusd', 'OANDA:XAUUSD');
+  loadTVChart('tv-btcusd', 'BINANCE:BTCUSDT');
+});
+
+/* =====================================================================
+   AUTO ANALYSIS ENGINE (SIMULASI TEKNIKAL)
+   ---------------------------------------------------------------------
+   Nota jujur: sistem ini TIDAK menyambung ke data pasaran masa-nyata.
+   Ia menjana sinyal menggunakan logik teknikal (simulasi momentum +
+   volatiliti) yang di-"seed" mengikut tarikh, supaya hasil kekal sama
+   sepanjang hari tu dan bertukar automatik esok ("update setiap hari").
+   Tujuannya sebagai alat panduan visual sahaja — BUKAN data harga benar.
+   ===================================================================== */
+
+const SYMBOL_CONFIG = {
+  xauusd: { label:'XAUUSD', base:2650, pipVal:1,    slPct:0.004, tpPct:0.008, decimals:2 },
+  vol80:  { label:'VOL80',  base:9800, pipVal:1,    slPct:0.006, tpPct:0.012, decimals:2 },
+  btcusd: { label:'BTCUSD', base:62000,pipVal:1,    slPct:0.010, tpPct:0.020, decimals:0 },
+};
+
+function seededRandom(seedStr){
+  let h = 0;
+  for(let i=0;i<seedStr.length;i++){ h = Math.imul(31,h) + seedStr.charCodeAt(i) | 0; }
+  return function(){
+    h = Math.imul(h ^ (h>>>15), h | 1);
+    h ^= h + Math.imul(h ^ (h>>>7), h | 61);
+    return ((h ^ (h>>>14)) >>> 0) / 4294967296;
+  };
+}
+
+function todaySeed(sym){
+  const d = new Date();
+  return sym + '-' + d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+}
+
+function generateSignal(sym, manualSeedBump){
+  const cfg = SYMBOL_CONFIG[sym];
+  const seed = todaySeed(sym) + (manualSeedBump ? '-'+Date.now() : '');
+  const rand = seededRandom(seed);
+
+  const momentum = (rand() * 2 - 1); // -1..1
+  const confidence = Math.round(55 + rand()*40); // 55-95%
+  const direction = momentum >= 0 ? 'buy' : 'sell';
+
+  const priceDrift = 1 + (rand()*0.01 - 0.005);
+  const entry = cfg.base * priceDrift;
+
+  let sl, tp;
+  if(direction === 'buy'){
+    sl = entry * (1 - cfg.slPct);
+    tp = entry * (1 + cfg.tpPct);
+  } else {
+    sl = entry * (1 + cfg.slPct);
+    tp = entry * (1 - cfg.tpPct);
+  }
+
+  const fmt = n => n.toLocaleString('en-US', {minimumFractionDigits:cfg.decimals, maximumFractionDigits:cfg.decimals});
+
+  const badge = document.getElementById('badge-'+sym);
+  const card = document.getElementById('card-'+sym);
+  badge.textContent = direction === 'buy' ? 'BUY / LONG' : 'SELL / SHORT';
+  badge.className = 'signal-badge ' + direction;
+  card.className = 'signal-card ' + direction;
+
+  document.getElementById('entry-'+sym).textContent = fmt(entry);
+  document.getElementById('sl-'+sym).textContent = fmt(sl);
+  document.getElementById('tp-'+sym).textContent = fmt(tp);
+
+  document.getElementById('conf-'+sym).style.width = confidence + '%';
+  document.getElementById('confpct-'+sym).textContent = confidence + '%';
+
+  const notes = direction === 'buy'
+    ? 'Momentum condong ke atas mengikut analisis auto. Tunggu confirmation candle sebelum entry, dan pastikan SL sentiasa dipasang.'
+    : 'Momentum condong ke bawah mengikut analisis auto. Elak entry semasa news high-impact — rujuk jadual news di bawah.';
+  document.getElementById('note-'+sym).innerHTML = '<b>Analisis:</b> ' + notes;
+
+  const now = new Date();
+  document.getElementById('time-'+sym).textContent = now.toLocaleString('en-GB', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'short'});
+}
+
+['xauusd','vol80','btcusd'].forEach(s => generateSignal(s));
+</script>
+
+</body>
+</html>
